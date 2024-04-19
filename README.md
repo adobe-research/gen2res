@@ -47,26 +47,10 @@ After we have the personalized model, we can run the following command to restor
 
 ```bash
 python scripts/ref_sample_single.py \
-            --attention_resolutions 16 \
-            --class_cond False \
-            --diffusion_steps 1000 \
-            --dropout 0.1 \
-            --image_size 256 \
-            --learn_sigma True \
-            --noise_schedule linear \
-            --num_channels 128 \
-            --num_heads 1 \
-            --num_res_blocks 2 \
-            --resblock_updown True \
-            --use_fp16 True \
-            --use_scale_shift_norm True \
-            --outputdir output/{}/{}_5/ns{}_skip{} \
-            --batch_size 1 \
-            --noise_step {} \
-            --last 0 \
-            --skip {} \
-            --data_dir /sensei-fs/users/zding/Adobe2023/datasets/p256_{}_test \
-            --model_path log/{}/person/{}_5_reg0.0/model005000.pt \
+            --noise_step 200 \
+            --data_dir PATH_TO_INPUT_IMAGES \
+            --outputdir restored_images \
+            --model_path PATH_TO_FINETUNED_MODEL \
 ```
 
 ## Citation
