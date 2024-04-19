@@ -15,7 +15,7 @@
 conda create -n gen2res python=3.8
 conda activate gen2res
 conda install pytorch=1.11 cudatoolkit=11.3 torchvision -c pytorch
-conda install dlib mpi4py scikit-learn scikit-image tqdm -c conda-forge
+conda install dlib mpi4py scikit-learn scikit-image -c conda-forge
 pip install blobfile==2.0.2 tqdm
 ```
 
