@@ -1,6 +1,20 @@
-from abc import abstractmethod
+"""
+*******************************************************************************
+Copyright 2024 Adobe
+All Rights Reserved.
+NOTICE: All information contained herein is, and remains
+the property of Adobe and its suppliers, if any. The intellectual
+and technical concepts contained herein are proprietary to Adobe
+and its suppliers and are protected by all applicable intellectual
+property laws, including trade secret and copyright laws.
+Dissemination of this information or reproduction of this material
+is strictly forbidden unless prior written permission is obtained
+from Adobe.
+*******************************************************************************
+"""
 
 import math
+from abc import abstractmethod
 
 import numpy as np
 import torch as th
@@ -8,15 +22,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from .fp16_util import convert_module_to_f16, convert_module_to_f32
-from .nn import (
-    checkpoint,
-    conv_nd,
-    linear,
-    avg_pool_nd,
-    zero_module,
-    normalization,
-    timestep_embedding,
-)
+from .nn import (avg_pool_nd, checkpoint, conv_nd, linear, normalization,
+                 timestep_embedding, zero_module)
 
 # class AttentionPool2d(nn.Module):
 #     """

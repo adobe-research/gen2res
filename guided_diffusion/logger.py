@@ -1,16 +1,29 @@
 """
+*******************************************************************************
+Copyright 2024 Adobe
+All Rights Reserved.
+NOTICE: All information contained herein is, and remains
+the property of Adobe and its suppliers, if any. The intellectual
+and technical concepts contained herein are proprietary to Adobe
+and its suppliers and are protected by all applicable intellectual
+property laws, including trade secret and copyright laws.
+Dissemination of this information or reproduction of this material
+is strictly forbidden unless prior written permission is obtained
+from Adobe.
+*******************************************************************************
+
 Logger copied from OpenAI baselines to avoid extra RL-based dependencies:
 https://github.com/openai/baselines/blob/ea25b9e8b234e6ee1bca43083f8f3cf974143998/baselines/logger.py
 """
 
-import os
-import sys
-import shutil
-import os.path as osp
-import json
-import time
 import datetime
+import json
+import os
+import os.path as osp
+import shutil
+import sys
 import tempfile
+import time
 import warnings
 from collections import defaultdict
 from contextlib import contextmanager
@@ -163,8 +176,8 @@ class TensorBoardOutputFormat(KVWriter):
     prefix = "events"
     path = osp.join(osp.abspath(dir), prefix)
     import tensorflow as tf
-    from tensorflow.python import pywrap_tensorflow
     from tensorflow.core.util import event_pb2
+    from tensorflow.python import pywrap_tensorflow
     from tensorflow.python.util import compat
 
     self.tf = tf

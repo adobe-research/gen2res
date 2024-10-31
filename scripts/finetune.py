@@ -1,10 +1,23 @@
 """
+*******************************************************************************
+Copyright 2024 Adobe
+All Rights Reserved.
+NOTICE: All information contained herein is, and remains
+the property of Adobe and its suppliers, if any. The intellectual
+and technical concepts contained herein are proprietary to Adobe
+and its suppliers and are protected by all applicable intellectual
+property laws, including trade secret and copyright laws.
+Dissemination of this information or reproduction of this material
+is strictly forbidden unless prior written permission is obtained
+from Adobe.
+*******************************************************************************
+
 Train a diffusion model on images.
 """
 
 import argparse
-import sys
 import os
+import sys
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__),
                                                 "..")))
@@ -12,12 +25,9 @@ sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__),
 from guided_diffusion import dist_util, logger
 from guided_diffusion.image_datasets import load_data_local, load_data_reg
 from guided_diffusion.resample import create_named_schedule_sampler
-from guided_diffusion.script_util import (
-    model_and_diffusion_defaults,
-    create_model_and_diffusion,
-    args_to_dict,
-    add_dict_to_argparser,
-)
+from guided_diffusion.script_util import (add_dict_to_argparser, args_to_dict,
+                                          create_model_and_diffusion,
+                                          model_and_diffusion_defaults)
 from guided_diffusion.train_util import TrainLoop
 
 

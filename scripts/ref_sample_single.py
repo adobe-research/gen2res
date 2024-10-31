@@ -1,4 +1,17 @@
 """
+*******************************************************************************
+Copyright 2024 Adobe
+All Rights Reserved.
+NOTICE: All information contained herein is, and remains
+the property of Adobe and its suppliers, if any. The intellectual
+and technical concepts contained herein are proprietary to Adobe
+and its suppliers and are protected by all applicable intellectual
+property laws, including trade secret and copyright laws.
+Dissemination of this information or reproduction of this material
+is strictly forbidden unless prior written permission is obtained
+from Adobe.
+*******************************************************************************
+
 Generate a large batch of image samples from a model and save them as a large
 numpy array. This can be used to produce samples for FID evaluation.
 """
@@ -10,33 +23,24 @@ import sys
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__),
                                                 "..")))
 
+import math
+import time
+
+import cv2
 import numpy as np
 import torch as th
 import torch.distributed as dist
+import torch.nn.functional as F
 from facelib.utils.face_restoration_helper import FaceRestoreHelper
-import cv2
-
 from torchvision.transforms.functional import normalize
-from torchvision.utils import make_grid
-
-import math
-
-from guided_diffusion.image_datasets import create_dataloader
+from torchvision.utils import make_grid, save_image
 
 from guided_diffusion import dist_util, logger
-from guided_diffusion.script_util import (
-    NUM_CLASSES,
-    model_and_diffusion_defaults,
-    create_model_and_diffusion,
-    add_dict_to_argparser,
-    args_to_dict,
-)
-
-from torchvision.utils import save_image
-
-import torch.nn.functional as F
-
-import time
+from guided_diffusion.image_datasets import create_dataloader
+from guided_diffusion.script_util import (NUM_CLASSES, add_dict_to_argparser,
+                                          args_to_dict,
+                                          create_model_and_diffusion,
+                                          model_and_diffusion_defaults)
 
 
 def img2tensor(imgs, bgr2rgb=True, float32=True):

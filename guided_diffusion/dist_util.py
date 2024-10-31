@@ -1,4 +1,17 @@
 """
+*******************************************************************************
+Copyright 2024 Adobe
+All Rights Reserved.
+NOTICE: All information contained herein is, and remains
+the property of Adobe and its suppliers, if any. The intellectual
+and technical concepts contained herein are proprietary to Adobe
+and its suppliers and are protected by all applicable intellectual
+property laws, including trade secret and copyright laws.
+Dissemination of this information or reproduction of this material
+is strictly forbidden unless prior written permission is obtained
+from Adobe.
+*******************************************************************************
+
 Helpers for distributed training.
 """
 
@@ -7,9 +20,9 @@ import os
 import socket
 
 import blobfile as bf
-from mpi4py import MPI
 import torch as th
 import torch.distributed as dist
+from mpi4py import MPI
 
 # Change this to reflect your cluster layout.
 # The GPU for a given rank is (rank % GPUS_PER_NODE).

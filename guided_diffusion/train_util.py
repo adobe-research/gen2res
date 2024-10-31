@@ -1,29 +1,39 @@
+"""
+*******************************************************************************
+Copyright 2024 Adobe
+All Rights Reserved.
+NOTICE: All information contained herein is, and remains
+the property of Adobe and its suppliers, if any. The intellectual
+and technical concepts contained herein are proprietary to Adobe
+and its suppliers and are protected by all applicable intellectual
+property laws, including trade secret and copyright laws.
+Dissemination of this information or reproduction of this material
+is strictly forbidden unless prior written permission is obtained
+from Adobe.
+*******************************************************************************
+"""
+
 import copy
+import datetime
 import functools
+import itertools
 import os
+import time
 
 import blobfile as bf
+import numpy as np
 import torch as th
 import torch.distributed as dist
+import torch.nn as nn
+from PIL import Image
 from torch.nn.parallel.distributed import DistributedDataParallel as DDP
-from torch.optim import AdamW, Adam
+from torch.optim import Adam, AdamW
+from torchvision.utils import save_image
 
 from . import dist_util, logger
 from .fp16_util import MixedPrecisionTrainer
 from .nn import update_ema
 from .resample import LossAwareSampler, UniformSampler
-
-from PIL import Image
-import numpy as np
-
-import time
-import datetime
-
-import itertools
-
-import torch.nn as nn
-
-from torchvision.utils import save_image
 
 # For ImageNet experiments, this was a good default value.
 # We found that the lg_loss_scale quickly climbed to

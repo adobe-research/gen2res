@@ -1,4 +1,17 @@
 """
+*******************************************************************************
+Copyright 2024 Adobe
+All Rights Reserved.
+NOTICE: All information contained herein is, and remains
+the property of Adobe and its suppliers, if any. The intellectual
+and technical concepts contained herein are proprietary to Adobe
+and its suppliers and are protected by all applicable intellectual
+property laws, including trade secret and copyright laws.
+Dissemination of this information or reproduction of this material
+is strictly forbidden unless prior written permission is obtained
+from Adobe.
+*******************************************************************************
+
 This code started out as a PyTorch port of Ho et al's diffusion models:
 https://github.com/hojonathanho/diffusion/blob/1e0dceb3b3495bbe19116a5e1b3596cd0706c543/diffusion_tf/diffusion_utils_2.py
 
@@ -10,11 +23,10 @@ import math
 
 import numpy as np
 import torch as th
-
-from .nn import mean_flat
-from .losses import normal_kl, discretized_gaussian_log_likelihood
-
 from tqdm import tqdm
+
+from .losses import discretized_gaussian_log_likelihood, normal_kl
+from .nn import mean_flat
 
 
 def get_named_beta_schedule(schedule_name, num_diffusion_timesteps):

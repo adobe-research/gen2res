@@ -1,16 +1,28 @@
+"""
+*******************************************************************************
+Copyright 2024 Adobe
+All Rights Reserved.
+NOTICE: All information contained herein is, and remains
+the property of Adobe and its suppliers, if any. The intellectual
+and technical concepts contained herein are proprietary to Adobe
+and its suppliers and are protected by all applicable intellectual
+property laws, including trade secret and copyright laws.
+Dissemination of this information or reproduction of this material
+is strictly forbidden unless prior written permission is obtained
+from Adobe.
+*******************************************************************************
+"""
+
 import math
-import random
-
-from PIL import Image
-import blobfile as bf
-from mpi4py import MPI
-import numpy as np
-from torch.utils.data import DataLoader, Dataset
-
-import torch as th
 import os
-
 import random
+
+import blobfile as bf
+import numpy as np
+import torch as th
+from mpi4py import MPI
+from PIL import Image
+from torch.utils.data import DataLoader, Dataset
 
 
 def create_dataloader(

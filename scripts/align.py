@@ -1,6 +1,22 @@
+"""
+*******************************************************************************
+Copyright 2024 Adobe
+All Rights Reserved.
+NOTICE: All information contained herein is, and remains
+the property of Adobe and its suppliers, if any. The intellectual
+and technical concepts contained herein are proprietary to Adobe
+and its suppliers and are protected by all applicable intellectual
+property laws, including trade secret and copyright laws.
+Dissemination of this information or reproduction of this material
+is strictly forbidden unless prior written permission is obtained
+from Adobe.
+*******************************************************************************
+"""
+
 import bz2
 import os
 import os.path as osp
+from argparse import ArgumentParser
 
 import dlib
 import numpy as np
@@ -8,7 +24,6 @@ import PIL.Image
 import requests
 import scipy.ndimage
 from tqdm import tqdm
-from argparse import ArgumentParser
 
 LANDMARKS_MODEL_URL = 'http://dlib.net/files/shape_predictor_68_face_landmarks.dat.bz2'
 
