@@ -27,7 +27,7 @@ For finetuning, please prepare a personal dataset contains several images first 
 python scripts/align.py -i PATH_TO_PERSONAL_PHOTO_ALBUM -o personal_images_aligned -s 256
 ```
 
-Then we can run the following command to finetune the model. Please download the pretrained diffusion model trained on FFHQ from [here](). Feel free to try other pretrained diffusion models.
+Then we can run the following command to finetune the model. Please download the pretrained diffusion model trained on FFHQ from [here](https://github.com/adobe-research/gen2res/releases/download/v1.0.0/base_256.pt). Feel free to try other pretrained diffusion models.
 
 ```bash
 python scripts/finetune.py 
@@ -43,7 +43,7 @@ python scripts/finetune.py
 
 Before we restore the low-quality images, we also need to restore the blind restoration
 
-After we have the personalized model, we can run the following command to restore the image. 
+After we have the personalized model, we can run the following command to restore the image.
 
 ```bash
 python scripts/ref_sample_single.py \
