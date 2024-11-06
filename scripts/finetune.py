@@ -47,22 +47,11 @@ def main():
 
   logger.log("creating data loader...")
 
-  if args.reg_ratio == 0.0:
-    data = load_data_local(
-        data_dir=args.data_dir,
-        batch_size=args.batch_size,
-        resolution=args.image_size,
-        img_name='' if args.personal else args.img_path.split('/')[-1],
-    )
-  else:
-    data = load_data_reg(
-        data_dir=args.reg_data_dir,
-        person_data_dir=args.data_dir,
-        batch_size=args.batch_size,
-        resolution=args.image_size,
-        img_name='' if args.personal else args.img_path.split('/')[-1],
-        reg_ratio=args.reg_ratio,
-    )
+  data = load_data_local(
+      data_dir=args.data_dir,
+      batch_size=args.batch_size,
+      resolution=args.image_size,
+  )
 
   logger.log("training...")
   TrainLoop(
@@ -84,7 +73,6 @@ def main():
       finetune=True,
       img_path=args.img_path,
       ftsteps=args.ftsteps,
-      finetune_sample=args.finetune_sample,
       outputdir=args.output_dir,
       noise_steps=args.noise_steps,
   ).run_loop()
@@ -101,15 +89,13 @@ def create_argparser():
       microbatch=-1,  # -1 disables microbatches
       ema_rate="0.9999",  # comma-separated list of EMA values
       log_interval=10,
-      save_interval=50000,
+      save_interval=5000,
       resume_checkpoint="",
       use_fp16=False,
       fp16_scale_growth=1e-3,
       log_dir="",
-      reg_ratio=0.0,
       reg_data_dir="",
       ftsteps=-1,
-      finetune_sample=False,
       output_dir="",
       img_path="",
       noise_steps=100,

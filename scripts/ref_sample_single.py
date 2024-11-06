@@ -29,10 +29,7 @@ import time
 import cv2
 import numpy as np
 import torch as th
-import torch.distributed as dist
 import torch.nn.functional as F
-from facelib.utils.face_restoration_helper import FaceRestoreHelper
-from torchvision.transforms.functional import normalize
 from torchvision.utils import make_grid, save_image
 
 from guided_diffusion import dist_util, logger
@@ -124,46 +121,6 @@ def tensor2img(tensor, rgb2bgr=True, out_type=np.uint8, min_max=(0, 1)):
   return result
 
 
-def set_realesrgan():
-  from basicsr.archs.rrdbnet_arch import RRDBNet
-  from basicsr.utils.realesrgan_utils import RealESRGANer
-
-  use_half = False
-  if th.cuda.is_available():  # set False in CPU/MPS mode
-    no_half_gpu_list = ['1650',
-                        '1660']  # set False for GPUs that don't support f16
-    if not True in [
-        gpu in th.cuda.get_device_name(0) for gpu in no_half_gpu_list
-    ]:
-      use_half = True
-
-  model = RRDBNet(
-      num_in_ch=3,
-      num_out_ch=3,
-      num_feat=64,
-      num_block=23,
-      num_grow_ch=32,
-      scale=2,
-  )
-  upsampler = RealESRGANer(
-      scale=2,
-      model_path=
-      "https://github.com/sczhou/CodeFormer/releases/download/v0.1.0/RealESRGAN_x2plus.pth",
-      model=model,
-      tile=400,  #args.bg_tile,
-      tile_pad=40,
-      pre_pad=0,
-      half=use_half)
-
-  # if not gpu_is_available():  # CPU
-  #     import warnings
-  #     warnings.warn('Running on CPU now! Make sure your PyTorch version matches your CUDA.'
-  #                     'The unoptimized RealESRGAN is slow on CPU. '
-  #                     'If you want to disable it, please remove `--bg_upsampler` and `--face_upsample` in command.',
-  #                     category=RuntimeWarning)
-  return upsampler
-
-
 def main():
   args = create_argparser().parse_args()
 
@@ -208,64 +165,11 @@ def main():
   tot = 0
   TOT = len(dataloader)
 
-  bg_upsampler = None
-  face_upsampler = None
-
-  if args.bg_upsample:
-    bg_upsampler = set_realesrgan()
-
-  start_time = time.time()
-
-  face_helper = FaceRestoreHelper(args.upscale,
-                                  face_size=args.image_size,
-                                  crop_ratio=(1, 1),
-                                  det_model='retinaface_resnet50',
-                                  save_ext='png',
-                                  use_parse=True,
-                                  device='cuda')
-
-  end_time = time.time()
-  print('create face_helper:' + str(end_time - start_time))
-  assert args.batch_size == 1, 'batch size must be 1 now'
+  assert args.batch_size == 1, 'batch size must be 1'
 
   for data, dic in dataloader:
-    face_helper.clean_all()
 
     data = data.to(dist_util.dev())
-    # if data.shape[0] == args.batch_size:
-    #     continue
-
-    if not args.input_aligned:
-      start_time = time.time()
-      face_helper.read_image(dic['path'][0])
-      num_det_faces = face_helper.get_face_landmarks_5(only_center_face=False,
-                                                       resize=640,
-                                                       eye_dist_threshold=5)
-      print(f'\tdetect {num_det_faces} faces')
-      # align and warp each face
-      face_helper.align_warp_face()
-      cropped_face = face_helper.cropped_faces[0]
-      cropped_face_t = img2tensor(cropped_face / 255.,
-                                  bgr2rgb=True,
-                                  float32=True)
-      normalize(cropped_face_t, (0.5, 0.5, 0.5), (0.5, 0.5, 0.5), inplace=True)
-      data = cropped_face_t.unsqueeze(0).to('cuda')
-
-      end_time = time.time()
-      print('align face:' + str(end_time - start_time))
-
-    finish = True
-    for i in range(data.shape[0]):
-      if not os.path.exists(os.path.join(args.outputdir, dic['filename'][i])):
-        finish = False
-        break
-
-    if finish:
-      print(os.path.join(args.outputdir, dic['filename'][0]))
-      continue
-    else:
-      print('running ' + os.path.join(args.outputdir, dic['filename'][0]))
-
     model_kwargs = {}
 
     sample_fn = (diffusion.p_sample_loop
@@ -284,55 +188,11 @@ def main():
         first=args.first,
     )
 
-    if not args.input_aligned:
-
-      restored_face = tensor2img(sample[0], rgb2bgr=True, min_max=(-1, 1))
-      restored_face = restored_face.astype('uint8')
-      face_helper.add_restored_face(restored_face, cropped_face)
-
-      # upsample the background
-      start_time = time.time()
-      if bg_upsampler is not None:
-        # Now only support RealESRGAN for upsampling background
-        bg_img = bg_upsampler.enhance(cv2.imread(dic['path'][0],
-                                                 cv2.IMREAD_COLOR),
-                                      outscale=args.upscale)[0]
-      else:
-        bg_img = None
-      end_time = time.time()
-      print('upsample bg:' + str(end_time - start_time))
-
-      start_time = time.time()
-      face_helper.get_inverse_affine(None)
-      # paste each restored face to the input image
-      if args.face_upsample and face_upsampler is not None:
-        restored_img = face_helper.paste_faces_to_input_image(
-            upsample_img=bg_img,
-            draw_box=args.draw_box,
-            face_upsampler=face_upsampler)
-      else:
-        restored_img = face_helper.paste_faces_to_input_image(
-            upsample_img=bg_img, draw_box=args.draw_box)
-
-      end_time = time.time()
-      print('paste back:' + str(end_time - start_time))
-
-      cropped_face_t = img2tensor(restored_img / 255.,
-                                  bgr2rgb=True,
-                                  float32=True)
-      normalize(cropped_face_t, (0.5, 0.5, 0.5), (0.5, 0.5, 0.5), inplace=True)
-      sample = cropped_face_t.unsqueeze(0)
-
-    # for i in range(sample.shape[0]):
     save_image((sample[0:1] + 1) / 2., os.path.join(args.outputdir,
-                                                    'output.png'))
-    # tot = tot + 1
+                                                    dic['filename'][0]))
 
-    # print(tot, args.num)
     if args.num != -1 and tot >= args.num:
       break
-
-    # logger.log(f"created {tot}/{TOT} samples")
 
 
 def create_argparser():
@@ -347,19 +207,9 @@ def create_argparser():
       skip=10,
       scale=0.3,
       noise_step=0,
-      step=5000,
-      ans=0,
-      askip=0,
       first=0,
-      reg_ratio=0.0,
       mode="",
-      ftsteps=-1,
       num=-1,
-      input_aligned=True,
-      draw_box=False,
-      face_upsample=False,
-      bg_upsample=False,
-      upscale=2,
   )
   defaults.update(model_and_diffusion_defaults())
   parser = argparse.ArgumentParser()
